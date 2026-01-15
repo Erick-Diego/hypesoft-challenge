@@ -11,6 +11,8 @@ public static class InfrastructureServiceExtensions
             configuration.GetSection("MongoDbSettings")
         );
         services.AddSingleton<MongoDbService>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         return services;
     }
