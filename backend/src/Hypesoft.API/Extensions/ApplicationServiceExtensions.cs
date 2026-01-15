@@ -8,15 +8,12 @@ public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // MediatR (CQRS)
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(typeof(ProductValidator).Assembly);
         });
 
-        // AutoMapper
         services.AddAutoMapper(typeof(ProductValidator).Assembly);
 
-        // FluentValidation
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<ProductValidator>();
 
