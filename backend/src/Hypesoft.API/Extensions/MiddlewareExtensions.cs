@@ -6,7 +6,6 @@ public static class MiddlewareExtensions
 {
     public static WebApplication ConfigureMiddlewares(this WebApplication app)
     {
-        // Logging de requisições
         app.UseSerilogRequestLogging(options =>
         {
             options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -18,24 +17,19 @@ public static class MiddlewareExtensions
             };
         });
 
-        // Headers de segurança
         app.UseSecurityHeaders();
 
-        // Exception Handler global
         app.UseGlobalExceptionHandler();
 
-        // Swagger em desenvolvimento
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hypesoft API v1");
-                c.RoutePrefix = "swagger";
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hypesoft API v1");
+            c.RoutePrefix = "swagger";
+            c.DocumentTitle = "Hypesoft API - Documentação";
+            c.DisplayRequestDuration();
+        });
 
-        app.UseHttpsRedirection();
         app.UseCors();
         app.UseRateLimiter();
         
@@ -44,7 +38,6 @@ public static class MiddlewareExtensions
 
         app.MapControllers();
         
-        // Health Check Endpoints
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
         {
@@ -54,6 +47,11 @@ public static class MiddlewareExtensions
         {
             Predicate = _ => false
         });
+
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Aplicação iniciada em: http://localhost:5000");
+        logger.LogInformation("Swagger disponível em: http://localhost:5000/swagger");
+        logger.LogInformation("Health Check disponível em: http://localhost:5000/health");
 
         return app;
     }

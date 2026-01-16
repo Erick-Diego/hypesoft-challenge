@@ -20,12 +20,10 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Cate
 
     public async Task<CategoryDto> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        // Verificar se já existe categoria com o mesmo nome
         var existingCategory = await _categoryRepository.GetByNameAsync(request.Category.Name);
         if (existingCategory != null)
             throw new InvalidOperationException($"Category with name '{request.Category.Name}' already exists");
 
-        // Criar categoria usando Factory Method
         var category = Category.Create(request.Category.Name, request.Category.Description);
 
         var createdCategory = await _categoryRepository.AddAsync(category);

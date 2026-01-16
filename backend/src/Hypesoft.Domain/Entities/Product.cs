@@ -10,12 +10,10 @@ public class Product : BaseEntity
     public string? ImageUrl { get; set; }
     public string? Sku { get; set; }
     
-    // Computed Properties (não salvos no banco)
     public bool IsLowStock => StockQuantity < 10;
     public bool IsOutOfStock => StockQuantity <= 0;
     public decimal TotalStockValue => Price * StockQuantity;
     
-    // Factory Method
     public static Product Create(
         string name, 
         string description, 
@@ -43,7 +41,6 @@ public class Product : BaseEntity
         };
     }
     
-    // Domain Methods
     public void Update(
         string name, 
         string description, 

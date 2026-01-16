@@ -1,7 +1,6 @@
 using Hypesoft.API.Extensions;
 using Serilog;
 
-// Configurar Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
@@ -18,23 +17,19 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-    // Usar Serilog como provider de logging
     builder.Host.UseSerilog();
 
-    // Registrar serviços (Extension Methods - SOLID)
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
     builder.Services.AddApiServices(builder.Configuration);
 
-    // Configurar Kestrel para Docker
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.ListenAnyIP(80);
+        options.ListenAnyIP(5000);
     });
 
     var app = builder.Build();
 
-    // Configurar pipeline de middlewares
     app.ConfigureMiddlewares();
 
     Log.Information("Hypesoft API iniciada com sucesso");

@@ -49,9 +49,9 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_HTTP_RELATIVE_PATH: /
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
       retries: 5
       start_period: 60s
     networks:
@@ -64,13 +64,14 @@ services:
     container_name: hypesoft-api
     restart: always
     ports:
-      - "5000:80"
+      - "5000:5000"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:5000"
       MongoDbSettings__ConnectionString: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       MongoDbSettings__DatabaseName: HypesoftDB
       Keycloak__Authority: http://keycloak:8080/realms/hypesoft
-      Keycloak__Audience: hypesoft-api
+      Keycloak__Audience: account
       Keycloak__RequireHttpsMetadata: "false"
     depends_on:
       mongodb:
@@ -78,7 +79,7 @@ services:
       keycloak:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -90,15 +91,22 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000
+        VITE_API_BASE_URL: http://localhost:5000/api
+        VITE_KEYCLOAK_URL: http://localhost:8080
+        VITE_KEYCLOAK_REALM: hypesoft
+        VITE_KEYCLOAK_CLIENT_ID: hypesoft-frontend
     container_name: hypesoft-frontend
     restart: always
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:5000
-      REACT_APP_KEYCLOAK_URL: http://localhost:8080
-      REACT_APP_KEYCLOAK_REALM: hypesoft
-      REACT_APP_KEYCLOAK_CLIENT_ID: hypesoft-api
+      - VITE_API_URL=http://localhost:5000
+      - VITE_API_BASE_URL=http://localhost:5000/api
+      - VITE_KEYCLOAK_URL=http://localhost:8080
+      - VITE_KEYCLOAK_REALM=hypesoft
+      - VITE_KEYCLOAK_CLIENT_ID=hypesoft-frontend
     depends_on:
       api:
         condition: service_healthy

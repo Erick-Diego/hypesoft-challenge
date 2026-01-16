@@ -23,7 +23,6 @@ public class UpdateStockHandler : IRequestHandler<UpdateStockCommand, ProductDto
         if (product == null)
             return null;
 
-        // Atualizar estoque usando método de domínio
         product.UpdateStock(request.Quantity);
 
         var updatedProduct = await _productRepository.UpdateAsync(product);

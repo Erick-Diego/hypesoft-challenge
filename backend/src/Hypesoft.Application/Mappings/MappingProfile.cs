@@ -8,7 +8,6 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Product Mappings
         CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.IsLowStock, opt => opt.MapFrom(src => src.IsLowStock))
             .ForMember(dest => dest.IsOutOfStock, opt => opt.MapFrom(src => src.IsOutOfStock))
@@ -29,7 +28,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.StockQuantity, opt => opt.Ignore())
             .ForMember(dest => dest.Sku, opt => opt.Ignore());
 
-        // Category Mappings
         CreateMap<Category, CategoryDto>();
 
         CreateMap<CreateCategoryDto, Category>()

@@ -44,7 +44,6 @@ public class CategoryRepository : ICategoryRepository
         var category = await GetByIdAsync(id);
         if (category == null) return false;
 
-        // Soft delete
         category.Deactivate();
         await UpdateAsync(category);
         return true;

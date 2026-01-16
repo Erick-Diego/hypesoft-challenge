@@ -24,17 +24,13 @@ public class GetDashboardHandler : IRequestHandler<GetDashboardQuery, DashboardD
 
     public async Task<DashboardDto> Handle(GetDashboardQuery request, CancellationToken cancellationToken)
     {
-        // Total de produtos
         var totalProducts = await _productRepository.GetTotalCountAsync();
 
-        // Valor total do estoque
         var totalStockValue = await _productRepository.GetTotalStockValueAsync();
 
-        // Produtos com estoque baixo
         var lowStockProducts = await _productRepository.GetLowStockProductsAsync();
         var lowStockProductDtos = _mapper.Map<IEnumerable<ProductDto>>(lowStockProducts);
 
-        // Estatísticas por categoria
         var categories = await _categoryRepository.GetAllAsync();
         var allProducts = await _productRepository.GetAllAsync();
 

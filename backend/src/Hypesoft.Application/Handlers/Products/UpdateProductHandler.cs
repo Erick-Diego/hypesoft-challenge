@@ -28,12 +28,10 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Produc
         if (product == null)
             return null;
 
-        // Validar se a nova categoria existe
         var categoryExists = await _categoryRepository.ExistsAsync(request.Product.CategoryId);
         if (!categoryExists)
             throw new ArgumentException($"Category with ID {request.Product.CategoryId} not found");
 
-        // Atualizar usando método de domínio
         product.Update(
             request.Product.Name,
             request.Product.Description,

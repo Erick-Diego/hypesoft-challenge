@@ -15,7 +15,6 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryCommand, bool
 
     public async Task<bool> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
-        // Verificar se a categoria tem produtos
         var hasProducts = await _categoryRepository.HasProductsAsync(request.Id);
         if (hasProducts)
             throw new InvalidOperationException("Cannot delete category with associated products");

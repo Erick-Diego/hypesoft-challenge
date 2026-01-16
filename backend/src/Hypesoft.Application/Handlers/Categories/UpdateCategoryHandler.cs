@@ -23,12 +23,10 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Cate
         if (category == null)
             return null;
 
-        // Verificar se outro categoria já tem esse nome
         var existingCategory = await _categoryRepository.GetByNameAsync(request.Category.Name);
         if (existingCategory != null && existingCategory.Id != request.Id)
             throw new InvalidOperationException($"Category with name '{request.Category.Name}' already exists");
 
-        // Atualizar usando método de domínio
         category.Update(request.Category.Name, request.Category.Description);
 
         var updatedCategory = await _categoryRepository.UpdateAsync(category);
