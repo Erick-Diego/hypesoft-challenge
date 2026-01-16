@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace Hypesoft.API.Extensions;
 
@@ -86,13 +88,42 @@ public static class ServiceCollectionExtensions
                 options.Authority = keycloakConfig["Authority"];
                 options.Audience = keycloakConfig["Audience"];
                 options.RequireHttpsMetadata = false;
+                
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = "role"
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        if (context.Principal?.Identity is ClaimsIdentity identity)
+                        {
+                            var realmAccessClaim = identity.FindFirst("realm_access");
+                            if (realmAccessClaim != null)
+                            {
+                                using var doc = JsonDocument.Parse(realmAccessClaim.Value);
+                                if (doc.RootElement.TryGetProperty("roles", out var rolesElement))
+                                {
+                                    foreach (var role in rolesElement.EnumerateArray())
+                                    {
+                                        var roleValue = role.GetString();
+                                        if (!string.IsNullOrEmpty(roleValue))
+                                        {
+                                            identity.AddClaim(new Claim("role", roleValue));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
