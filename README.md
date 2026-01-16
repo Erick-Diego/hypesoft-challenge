@@ -4,6 +4,8 @@
 Sistema de gerenciamento de produtos e categorias desenvolvido com Clean Architecture, DDD e CQRS.  
 Funcionalidades incluem cadastro completo de produtos e categorias, controle de estoque, busca/filtragem, paginação e dashboard com métricas.
 
+[Video de Apresentação do Projeto]()
+
 Tecnologias principais:
 - **Backend:** .NET 9, C#, Clean Architecture, DDD, CQRS, FluentValidation
 - **Banco de dados:** MongoDB
